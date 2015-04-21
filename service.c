@@ -1,6 +1,9 @@
 #include "rfos.h"
 #include <stdio.h>
 
+char ***disk_array;
+int disk_number;
+
 static gboolean on_handle_get (
     RFOS *object,
     GDBusMethodInvocation *invocation,
@@ -24,7 +27,7 @@ static gboolean on_handle_put (
     guint err = 0;
     /** End of Put method execution, returning values **/
     rfos_complete_put(object, invocation, err);
- 
+
     return TRUE;
 }
 
@@ -44,8 +47,11 @@ static void on_name_acquired (GDBusConnection *connection,
         NULL);
 }
 
-int main (void)
+int main (int argc, char** argv)
 {
+    disk_number = argc;
+    disk_array = &argv;
+
     /* Initialize daemon main loop */
     GMainLoop *loop = g_main_loop_new (NULL, FALSE);
     /* Attempt to register the daemon with 'kmitl.ce.os.RFOS' name on the bus */
