@@ -1,10 +1,8 @@
 #include "rfos.h"
+#include "fsutils.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
-
-const char magic_number[] = "e1e1";
-const int block_size = 64;
 
 char ***disk_array;
 int disk_number;
@@ -59,22 +57,39 @@ void init_disk(const char *disk_name, int tag)
     if(fp == NULL)
     {
         fprintf(stderr, "fopen failed with errno %d\n", errno);
+        perror("Error description: ");
         exit(errno);
     }
 
-    gint64 disk_size = 0;
-    fseek(fp, 0, SEEK_END);
-    disk_size = (gint64)ftello(fp);
-    fprintf(stderr, "%s %ld\n", "size = ", disk_size);
-    fprintf(stderr, "sizeof(gint64) = %lu sizeof(disk_size) = %lu\n", sizeof(gint64), sizeof(disk_size));
+    init_metadata(fp, 1);
+    gint64 ds, nob;
+    int bs;
+    char enr0, r0no;
+    char mgno[3], endmt[4];
 
     rewind(fp);
+    fread(mgno, sizeof(char), sizeof(mgno)/sizeof(char), fp);
+    fread(&bs, sizeof(int), sizeof(bs)/sizeof(int), fp);
+    fread(&nob, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
+    fread(&ds, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
+    fread(&enr0, sizeof(char), sizeof(enr0)/sizeof(char), fp);
+    fread(&r0no, sizeof(char), sizeof(r0no)/sizeof(char), fp);
+    fread(endmt, sizeof(char), sizeof(endmt)/sizeof(char), fp);
 
-    fwrite(magic_number, sizeof(char), sizeof(magic_number)/sizeof(char), fp);
-    fwrite(&disk_size, sizeof(gint64), sizeof(disk_size)/sizeof(gint64), fp);
+    printf("read:\n");
+    printf("%s %d %lld %lld %d %d %s\n", mgno, bs, (long long int)nob, (long long int)ds, enr0, r0no, endmt);
+    // gint64 disk_size = 0;
+    // fseek(fp, 0, SEEK_END);
+    // disk_size = (gint64)ftello(fp);
+    // fprintf(stderr, "%s %ld\n", "size = ", disk_size);
+    // fprintf(stderr, "sizeof(gint64) = %lu sizeof(disk_size) = %lu\n", sizeof(gint64), sizeof(disk_size));
 
-    fflush(fp);
+    // rewind(fp);
 
+    // fwrite(magic_number, sizeof(char), sizeof(magic_number)/sizeof(char), fp);
+    // fwrite(&disk_size, sizeof(gint64), sizeof(disk_size)/sizeof(gint64), fp);
+
+    // fflush(fp);
     fclose(fp);
 
     fprintf(stderr, "%s\n", "disk initialized");
