@@ -61,35 +61,32 @@ void init_disk(const char *disk_name, int tag)
         exit(errno);
     }
 
-    init_metadata(fp, 1);
-    gint64 ds, nob;
-    int bs;
-    char enr0, r0no;
-    char mgno[3], endmt[4];
-
-    rewind(fp);
-    fread(mgno, sizeof(char), sizeof(mgno)/sizeof(char), fp);
-    fread(&bs, sizeof(int), sizeof(bs)/sizeof(int), fp);
-    fread(&nob, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
-    fread(&ds, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
-    fread(&enr0, sizeof(char), sizeof(enr0)/sizeof(char), fp);
-    fread(&r0no, sizeof(char), sizeof(r0no)/sizeof(char), fp);
-    fread(endmt, sizeof(char), sizeof(endmt)/sizeof(char), fp);
-
-    printf("read:\n");
-    printf("%s %d %lld %lld %d %d %s\n", mgno, bs, (long long int)nob, (long long int)ds, enr0, r0no, endmt);
-    // gint64 disk_size = 0;
-    // fseek(fp, 0, SEEK_END);
-    // disk_size = (gint64)ftello(fp);
-    // fprintf(stderr, "%s %ld\n", "size = ", disk_size);
-    // fprintf(stderr, "sizeof(gint64) = %lu sizeof(disk_size) = %lu\n", sizeof(gint64), sizeof(disk_size));
+    init_metadata(fp, tag);
+    // gint64 ds, nob;
+    // int bs;
+    // char enr0, r0no;
+    // char mgno[3], endmt[4];
 
     // rewind(fp);
+    // fseeko(fp, 0, SEEK_SET);
+    // fread(mgno, sizeof(char), sizeof(mgno)/sizeof(char), fp);
+    // rewind(fp);
+    // fseeko(fp, 3, SEEK_SET);
+    // fread(&bs, sizeof(int), sizeof(bs)/sizeof(int), fp);
+    // fseeko(fp, 7, SEEK_SET);
+    // fread(&nob, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
+    // fseeko(fp, 15, SEEK_SET);
+    // fread(&ds, sizeof(gint64), sizeof(nob)/sizeof(gint64), fp);
+    // fseeko(fp, 23, SEEK_SET);
+    // fread(&enr0, sizeof(char), sizeof(enr0)/sizeof(char), fp);
+    // fseeko(fp, 24, SEEK_SET);
+    // fread(&r0no, sizeof(char), sizeof(r0no)/sizeof(char), fp);
+    // fseeko(fp, 25, SEEK_SET);
+    // fread(endmt, sizeof(char), sizeof(endmt)/sizeof(char), fp);
 
-    // fwrite(magic_number, sizeof(char), sizeof(magic_number)/sizeof(char), fp);
-    // fwrite(&disk_size, sizeof(gint64), sizeof(disk_size)/sizeof(gint64), fp);
+    // printf("read:\n");
+    // printf("%s %d %lld %lld %d %d %s\n", mgno, bs, (long long int)nob, (long long int)ds, enr0, r0no, endmt);
 
-    // fflush(fp);
     fclose(fp);
 
     fprintf(stderr, "%s\n", "disk initialized");
