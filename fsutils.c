@@ -47,6 +47,7 @@ void init_metadata(FILE *fp, int _is_raid0)
     char *free_space_bytemap = (char*)calloc(sizeof(char), no_of_blocks);
     fwrite(free_space_bytemap, sizeof(char), no_of_blocks, fp);
     fflush(fp);
+    free(free_space_bytemap);
 }
 gint64 get_disk_size(FILE *fp)
 {
@@ -86,14 +87,16 @@ int put_file(const char *key, const char *src, FILE *fp)
     fflush(fp);
 
     guchar buffer[block_size];
+    gint64 bytes_written = 0;
     while(!feof(fsrc))
     {
         int read_bytes = fread(buffer, sizeof(guchar), block_size, fsrc);
         fwrite(buffer, sizeof(guchar), read_bytes, fp);
+        bytes_written += read_bytes;
         fflush(fp);
     }
     fclose(fsrc);
 
-    return 0;
+    return bytes_written;
 }
 

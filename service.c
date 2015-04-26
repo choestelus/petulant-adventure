@@ -26,10 +26,32 @@ static gboolean on_handle_put (
     const gchar *key,
     const gchar *src) {
 
-    /** Your code for Put method here **/
     guint err = 0;
+
+    FILE **fpd;
+    fpd = (FILE**)malloc(sizeof(FILE*)*disk_number);
+    int i = 0;
+    for(i=0; i< disk_number-1; i++)
+    {
+        fpd[i] = fopen((*disk_array)[i+1], "rb+");
+    }
+    fprintf(stderr, "%s\n", "still works");
+    /** Your code for Put method here **/
+    // gint64 bytes_written1 = put_file(key, src, fp1);
+    // gint64 bytes_written2 = put_file(key, src, fp2);
+    for(i = 0; i<disk_number -1; i++)
+    {
+        fprintf(stderr, "%s\n", "sitll works in write loop");
+        gint64 bytes_written = put_file(key, src, fpd[i]);
+        fprintf(stderr, "written: %lld\n", (long long int)bytes_written);
+    }
+
+    err = 0;
     /** End of Put method execution, returning values **/
     rfos_complete_put(object, invocation, err);
+    for(i=0; i< disk_number -1; i++)
+        fclose(fpd[i]);
+    free(fpd);
 
     return TRUE;
 }
